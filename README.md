@@ -1,0 +1,1 @@
+# Boobook - A social network application for Otus course (Highload Architecture)
