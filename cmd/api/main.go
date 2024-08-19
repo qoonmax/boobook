@@ -1,40 +1,44 @@
 package main
 
 import (
+	"boobook/internal/app/service_provider"
+	"boobook/internal/config"
+	"boobook/internal/http/middleware"
+	"boobook/internal/repository/postgres"
+	"boobook/internal/slogger"
 	"database/sql"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
-	"socialNetwork/internal/app/service_provider"
-	"socialNetwork/internal/config"
-	"socialNetwork/internal/repository/postgres"
 	"time"
 )
 
 func main() {
-	cfg := config.MustLoad()
-	//log := setupLogger(cfg.Env)
-	//log.Info("starting server")
+	logger := slogger.NewLogger()
 
-	// Create database connection
+	cfg := config.MustLoad()
+
 	dbConnection, err := postgres.NewConnection(cfg.DBString)
 	if err != nil {
-		log.Fatal("failed to connect to the database", err)
+		logger.Error("failed to connect to the database", slogger.Err(err))
+		return
 	}
 
 	defer func(dbConn *sql.DB) {
-		if err := postgres.CloseConnection(dbConn); err != nil {
-			log.Fatal("failed to close the database connection", err)
+		if err = postgres.CloseConnection(dbConn); err != nil {
+			logger.Error("failed to close the database connection", slogger.Err(err))
+			return
 		}
 	}(dbConnection)
 
-	// Setup service provider
-	serviceProvider := service_provider.NewServiceProvider(dbConnection)
+	serviceProvider := service_provider.NewServiceProvider(
+		logger,
+		dbConnection,
+	)
 
 	// Setup server
 	httpServer := &http.Server{
 		Addr:           ":" + cfg.HTTPServerConfig.Port,
-		Handler:        setupHandler(serviceProvider),
+		Handler:        setupRouter(serviceProvider),
 		MaxHeaderBytes: 1 << 2,
 		ReadTimeout:    cfg.HTTPServerConfig.Timeout * time.Second,
 		WriteTimeout:   cfg.HTTPServerConfig.Timeout * time.Second,
@@ -42,43 +46,27 @@ func main() {
 
 	// Start server
 	if err = httpServer.ListenAndServe(); err != nil {
-		log.Fatal(err)
+		logger.Error("failed to start the server", slogger.Err(err))
+		return
 	}
 }
 
-//
-//const (
-//	localEnv = "local"
-//	devEnv   = "dev"
-//	prodEnv  = "prod"
-//)
-//
-//func setupLogger(env string) *slog.Logger {
-//	var log *slog.Logger
-//
-//	switch env {
-//	case localEnv:
-//		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-//	case devEnv:
-//		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-//	case prodEnv:
-//		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
-//	}
-//
-//	return log
-//}
+func setupRouter(serviceProvider *service_provider.ServiceProvider) *gin.Engine {
+	router := gin.Default()
 
-func setupHandler(serviceProvider *service_provider.ServiceProvider) *gin.Engine {
-	h := gin.Default()
-
-	api := h.Group("/api")
+	api := router.Group("/api")
 	{
+		api.Use(middleware.Log(serviceProvider.Logger))
+		auth := api.Group("/auth")
+		{
+			auth.POST("/login", serviceProvider.GetAuthHandler().Login)
+			auth.POST("/register", serviceProvider.GetAuthHandler().Register)
+		}
 		users := api.Group("/users")
 		{
-			users.GET("/:id", serviceProvider.GetUserHandler().Get)
-			users.POST("/", serviceProvider.GetUserHandler().Create)
+			users.Use(middleware.Auth()).GET("/:id", serviceProvider.GetUserHandler().Get)
 		}
 	}
 
-	return h
+	return router
 }

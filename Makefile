@@ -2,10 +2,17 @@ include .env
 
 to-dev:
 	go install github.com/pressly/goose/v3/cmd/goose@latest
-	docker compose up -d
+	go install github.com/air-verse/air@latest
+	docker compose up -d --build
+	$(MAKE) migrate_up
 
 run:
+	docker compose up -d --build
 	go run cmd/api/main.go
+
+air:
+	docker compose up -d --build
+	air server --port 8000
 
 create_migration:
 	GOOSE_DRIVER=$(DATABASE_DRIVER) GOOSE_DBSTRING=$(DATABASE_DBSTRING) GOOSE_MIGRATION_DIR=$(DATABASE_MIGRATION_DIR) goose create $(name) sql

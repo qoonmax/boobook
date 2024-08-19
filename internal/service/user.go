@@ -1,25 +1,28 @@
 package service
 
 import (
-	"socialNetwork/internal/repository"
-	"socialNetwork/internal/repository/model"
+	"boobook/internal/repository"
+	"boobook/internal/repository/model"
+	"fmt"
 )
 
 type userService struct {
-	UserRepository repository.UserRepository
+	userRepository repository.UserRepository
 }
 
 func NewUserService(userRepository repository.UserRepository) UserService {
 	return &userService{
-		UserRepository: userRepository,
+		userRepository: userRepository,
 	}
 }
 
-func (s *userService) Get(id int) (*model.User, error) {
-	//TODO implement me
-	panic("implement me")
-}
+func (s *userService) Get(id uint) (*model.User, error) {
+	const fnErr = "service.userService.Get"
 
-func (s *userService) Create(user *model.User) error {
-	return s.UserRepository.Create(user)
+	user, err := s.userRepository.Get(id)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", fnErr, err)
+	}
+
+	return user, nil
 }

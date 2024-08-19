@@ -1,10 +1,10 @@
 package service_provider
 
 import (
-	"socialNetwork/internal/http/handler"
-	"socialNetwork/internal/repository"
-	"socialNetwork/internal/repository/postgres"
-	"socialNetwork/internal/service"
+	"boobook/internal/http/handler"
+	"boobook/internal/repository"
+	"boobook/internal/repository/postgres"
+	"boobook/internal/service"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 
 func (sp *ServiceProvider) GetUserHandler() handler.UserHandler {
 	if userHandlerContainer == nil {
-		userHandlerContainer = handler.NewUserHandler(sp.GetUserService())
+		userHandlerContainer = handler.NewUserHandler(sp.Logger, sp.GetUserService())
 	}
 	return userHandlerContainer
 }

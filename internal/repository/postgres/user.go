@@ -1,12 +1,12 @@
 package postgres
 
 import (
+	"boobook/internal/repository"
+	"boobook/internal/repository/model"
 	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/lib/pq"
-	"socialNetwork/internal/repository"
-	"socialNetwork/internal/repository/model"
 )
 
 type userRepository struct {
@@ -51,7 +51,40 @@ func (r *userRepository) Create(user *model.User) error {
 	return nil
 }
 
-func (r *userRepository) Get(id int) (*model.User, error) {
+func (r *userRepository) GetByEmail(email string) (*model.User, error) {
+	const fnErr = "repository.postgres.userRepository.GetByEmail"
+
+	var user model.User
+	query := `
+		SELECT id, email, password, first_name, last_name, date_of_birth, gender, interests, city, created_at, updated_at 
+		FROM users 
+		WHERE email=$1
+	`
+	err := r.db.QueryRow(query, email).Scan(
+		&user.ID,
+		&user.Email,
+		&user.Password,
+		&user.FirstName,
+		&user.LastName,
+		&user.DateOfBirth,
+		&user.Gender,
+		&user.Interests,
+		&user.City,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, repository.ErrUserNotFound
+		}
+
+		return nil, fmt.Errorf("(%s) error getting user: %w", fnErr, err)
+	}
+
+	return &user, nil
+}
+
+func (r *userRepository) Get(id uint) (*model.User, error) {
 	const fnErr = "repository.postgres.userRepository.Get"
 
 	var user model.User

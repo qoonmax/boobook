@@ -1,40 +1,46 @@
 package handler
 
 import (
-	"fmt"
+	"boobook/internal/repository"
+	"boobook/internal/service"
+	"boobook/internal/slogger"
+	"errors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/gin-gonic/gin/binding"
 	_ "github.com/go-playground/validator/v10"
-	"socialNetwork/internal/repository/model"
-	"socialNetwork/internal/service"
+	"log/slog"
+	"net/http"
+	"strconv"
 )
 
-type Handler struct {
-	UserService service.UserService
+type userHandler struct {
+	logger      *slog.Logger
+	userService service.UserService
 }
 
-func NewUserHandler(userService service.UserService) *Handler {
-	return &Handler{
-		UserService: userService,
+func NewUserHandler(logger *slog.Logger, userService service.UserService) UserHandler {
+	return &userHandler{
+		logger:      logger,
+		userService: userService,
 	}
 }
 
-func (h *Handler) Create(ctx *gin.Context) {
-	user := &model.User{}
-	if err := ctx.BindJSON(user); err != nil {
-		ctx.JSON(400, gin.H{"error": "invalid payload: " + err.Error()})
+func (h *userHandler) Get(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
 	}
-	fmt.Println(user)
-
-	if err := h.UserService.Create(user); err != nil {
-		ctx.JSON(500, gin.H{"error": err.Error()})
+	user, err := h.userService.Get(uint(id))
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		} else {
+			h.logger.ErrorContext(ctx, "failed to get user", slogger.Err(err))
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
-	ctx.JSON(200, gin.H{"status": "ok"})
-}
-
-func (h *Handler) Get(ctx *gin.Context) {
-	panic("implement me")
+	ctx.JSON(http.StatusOK, gin.H{"user": user})
 }

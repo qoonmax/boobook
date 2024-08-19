@@ -1,16 +1,17 @@
 package repository
 
 import (
+	"boobook/internal/repository/model"
 	"errors"
-	"socialNetwork/internal/repository/model"
 )
-
-type UserRepository interface {
-	Get(id int) (*model.User, error)
-	Create(user *model.User) error
-}
 
 var (
 	ErrUserAlreadyExists = errors.New("user already exists")
 	ErrUserNotFound      = errors.New("user not found")
 )
+
+type UserRepository interface {
+	Get(id uint) (*model.User, error)
+	GetByEmail(email string) (*model.User, error)
+	Create(user *model.User) error
+}

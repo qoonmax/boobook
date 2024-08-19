@@ -1,8 +1,20 @@
 package service
 
-import "socialNetwork/internal/repository/model"
+import (
+	"boobook/internal/http/request"
+	"boobook/internal/repository/model"
+	"errors"
+)
+
+var (
+	ErrInvalidPassword = errors.New("invalid password")
+)
+
+type AuthService interface {
+	Login(loginRequest *request.LoginRequest) (string, error)
+	Register(registerRequest *request.RegisterRequest) error
+}
 
 type UserService interface {
-	Get(id int) (*model.User, error)
-	Create(user *model.User) error
+	Get(id uint) (*model.User, error)
 }

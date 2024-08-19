@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
-	"log"
 	"time"
 )
 
@@ -21,16 +20,13 @@ type HTTPServerConfig struct {
 }
 
 func MustLoad() *Config {
-	// Загружаем переменные окружения из файла .env
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
+		panic(err)
 	}
 
 	var cfg Config
-
-	// Читаем конфигурацию из файла
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
-		log.Fatalf("failed to load config: %v", err)
+		panic(err)
 	}
 
 	return &cfg

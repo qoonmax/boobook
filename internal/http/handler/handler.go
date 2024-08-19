@@ -4,7 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type AuthHandler interface {
+	Register(ctx *gin.Context)
+	Login(ctx *gin.Context)
+}
+
 type UserHandler interface {
-	Create(ctx *gin.Context)
 	Get(ctx *gin.Context)
 }
