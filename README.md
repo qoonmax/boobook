@@ -1,6 +1,6 @@
 # Boobook - Социальная сеть, домашняя работа курса Otus Highload Architecture
 
-![Image alt]()
+![Image alt](https://github.com/qoonmax/boobook/blob/main/cover.jpg)
 
 ### Локальная установка
 1. Склонируйте репозиторий;
