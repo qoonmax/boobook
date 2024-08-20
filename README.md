@@ -1,4 +1,4 @@
-# Boobook - Социальная сеть, домашняя работа курса Otus Highload Architecture
+# Boobook - социальная сеть, домашняя работа курса Otus Highload Architecture
 
 ![Image alt](https://github.com/qoonmax/boobook/blob/main/cover.jpg)
 
