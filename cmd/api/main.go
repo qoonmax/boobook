@@ -7,6 +7,7 @@ import (
 	"boobook/internal/repository/postgres"
 	"boobook/internal/slogger"
 	"database/sql"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -19,8 +20,7 @@ func main() {
 
 	dbConnection, err := postgres.NewConnection(cfg.DBString)
 	if err != nil {
-		logger.Error("failed to connect to the database", slogger.Err(err))
-		return
+		panic(fmt.Errorf("failed to connect to the database: %w", err))
 	}
 
 	defer func(dbConn *sql.DB) {
@@ -46,8 +46,7 @@ func main() {
 
 	// Start server
 	if err = httpServer.ListenAndServe(); err != nil {
-		logger.Error("failed to start the server", slogger.Err(err))
-		return
+		panic(fmt.Errorf("failed to start the server: %w", err))
 	}
 }
 
