@@ -3,12 +3,11 @@ package main
 import (
 	"boobook/internal/app/service_provider"
 	"boobook/internal/config"
-	"boobook/internal/http/middleware"
+	"boobook/internal/http/router"
 	"boobook/internal/repository/postgres"
 	"boobook/internal/slogger"
 	"database/sql"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
 )
@@ -38,7 +37,7 @@ func main() {
 	// Setup server
 	httpServer := &http.Server{
 		Addr:           ":" + cfg.HTTPServerConfig.Port,
-		Handler:        setupRouter(serviceProvider),
+		Handler:        router.SetupRouter(serviceProvider),
 		MaxHeaderBytes: 1 << 2,
 		ReadTimeout:    cfg.HTTPServerConfig.Timeout * time.Second,
 		WriteTimeout:   cfg.HTTPServerConfig.Timeout * time.Second,
@@ -48,24 +47,4 @@ func main() {
 	if err = httpServer.ListenAndServe(); err != nil {
 		panic(fmt.Errorf("failed to start the server: %w", err))
 	}
-}
-
-func setupRouter(serviceProvider *service_provider.ServiceProvider) *gin.Engine {
-	router := gin.Default()
-
-	api := router.Group("/api")
-	{
-		api.Use(middleware.Log(serviceProvider.Logger))
-		auth := api.Group("/auth")
-		{
-			auth.POST("/login", serviceProvider.GetAuthHandler().Login)
-			auth.POST("/register", serviceProvider.GetAuthHandler().Register)
-		}
-		users := api.Group("/users")
-		{
-			users.Use(middleware.Auth()).GET("/:id", serviceProvider.GetUserHandler().Get)
-		}
-	}
-
-	return router
 }

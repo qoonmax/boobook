@@ -44,3 +44,17 @@ func (h *userHandler) Get(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"user": user})
 }
+
+func (h *userHandler) Search(ctx *gin.Context) {
+	firstName := ctx.Query("first_name")
+	lastName := ctx.Query("last_name")
+
+	users, err := h.userService.Search(firstName, lastName)
+	if err != nil {
+		h.logger.ErrorContext(ctx, "failed to search users", slogger.Err(err))
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"users": users})
+}

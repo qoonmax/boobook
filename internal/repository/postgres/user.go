@@ -116,3 +116,59 @@ func (r *userRepository) Get(id uint) (*model.User, error) {
 
 	return &user, nil
 }
+
+func (r *userRepository) Search(firstName, lastName string) ([]*model.User, error) {
+	const fnErr = "repository.postgres.userRepository.Search"
+
+	var users []*model.User
+
+	query := `
+		SELECT id, email, password, first_name, last_name, date_of_birth, gender, interests, city, created_at, updated_at 
+		FROM users
+	`
+
+	var rows *sql.Rows
+	var err error
+	if firstName == "" && lastName == "" {
+		rows, err = r.db.Query(query)
+	} else {
+		query += " WHERE first_name LIKE $1 AND last_name LIKE $2"
+		rows, err = r.db.Query(query, firstName+"%", lastName+"%")
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", fnErr, err)
+	}
+
+	defer func() {
+		if err = rows.Close(); err != nil {
+			err = fmt.Errorf("%s: %w", fnErr, err)
+		}
+	}()
+
+	for rows.Next() {
+		var user model.User
+		if err = rows.Scan(
+			&user.ID,
+			&user.Email,
+			&user.Password,
+			&user.FirstName,
+			&user.LastName,
+			&user.DateOfBirth,
+			&user.Gender,
+			&user.Interests,
+			&user.City,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		); err != nil {
+			return nil, fmt.Errorf("%s: %w", fnErr, err)
+		}
+		users = append(users, &user)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: %w", fnErr, err)
+	}
+
+	return users, err
+}

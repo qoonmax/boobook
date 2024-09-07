@@ -121,7 +121,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjM2Nzk5NTYsInVzZXJfZW1haWwiOiJxb29ubWF4QHlhbmRleC5ydSJ9.0b3sqzdhEqug-3_F0vgY_nC4i698qPiqdwgWOIrY9Ns",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjQ0NTEzMjIsInVzZXJfZW1haWwiOiJxb29ubWF4QHlhbmRleC5ydSJ9.K6ehNA8iwQTMDSseft01EM2BIcD6iLOhu8bsEypoCKI",
 								"type": "text"
 							}
 						],
@@ -136,6 +136,39 @@
 								"api",
 								"users",
 								"8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjU0NzEyNzEsInVzZXJfZW1haWwiOiJxb29ubWF4QHlhbmRleC5ydSJ9.xlp_ixZ8qibRa9CnF74DIVPl4jUf44AWJCCcvVEc1IM",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/users/search?first_name=al",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"search"
+							],
+							"query": [
+								{
+									"key": "first_name",
+									"value": "al"
+								}
 							]
 						}
 					},

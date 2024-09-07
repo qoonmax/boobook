@@ -17,4 +17,5 @@ type AuthService interface {
 
 type UserService interface {
 	Get(id uint) (*model.User, error)
+	Search(firstName string, lastName string) ([]*model.User, error)
 }

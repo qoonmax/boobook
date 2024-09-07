@@ -14,4 +14,5 @@ type UserRepository interface {
 	Get(id uint) (*model.User, error)
 	GetByEmail(email string) (*model.User, error)
 	Create(user *model.User) error
+	Search(firstName, lastName string) ([]*model.User, error)
 }

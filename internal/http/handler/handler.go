@@ -11,4 +11,5 @@ type AuthHandler interface {
 
 type UserHandler interface {
 	Get(ctx *gin.Context)
+	Search(ctx *gin.Context)
 }
