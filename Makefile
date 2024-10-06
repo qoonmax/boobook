@@ -27,5 +27,5 @@ migrate_fresh:
 	docker compose exec -T postgres psql -U $(DATABASE_USER) -d $(DATABASE_NAME) -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
 	$(MAKE) migrate_up
 
-seed_user:
+run_user_seeder:
 	go run cmd/seed/user.go

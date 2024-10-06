@@ -51,8 +51,8 @@ func main() {
 		users[i] = model.User{
 			Email:       faker.Email(),
 			Password:    faker.Password(),
-			FirstName:   faker.FirstName(),
-			LastName:    faker.LastName(),
+			FirstName:   strings.ToLower(faker.FirstName()),
+			LastName:    strings.ToLower(faker.LastName()),
 			DateOfBirth: dateOfBirth,
 			Gender:      genders[randomGenderIdx],
 			Interests:   faker.Word(),

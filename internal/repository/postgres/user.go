@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/lib/pq"
+	"strconv"
+	"strings"
 )
 
 type userRepository struct {
@@ -129,12 +131,27 @@ func (r *userRepository) Search(firstName, lastName string) ([]*model.User, erro
 
 	var rows *sql.Rows
 	var err error
-	if firstName == "" && lastName == "" {
-		rows, err = r.db.Query(query)
-	} else {
-		query += " WHERE first_name LIKE $1 AND last_name LIKE $2"
-		rows, err = r.db.Query(query, firstName+"%", lastName+"%")
+	var filters []string
+	var args []interface{}
+
+	if lastName != "" {
+		lastName = strings.ToLower(lastName)
+		filters = append(filters, "last_name LIKE $"+strconv.Itoa(len(filters)+1))
+		args = append(args, lastName+"%")
 	}
+
+	if firstName != "" {
+		firstName = strings.ToLower(firstName)
+		filters = append(filters, "first_name LIKE $"+strconv.Itoa(len(filters)+1))
+		args = append(args, firstName+"%")
+	}
+
+	if len(filters) > 0 {
+		query += " WHERE " + strings.Join(filters, " AND ")
+	}
+
+	fmt.Println(query, args)
+	rows, err = r.db.Query(query, args...)
 
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", fnErr, err)
