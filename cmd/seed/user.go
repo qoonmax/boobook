@@ -23,17 +23,17 @@ func main() {
 
 	cfg := config.MustLoad()
 
-	dbConnection, err := postgres.NewConnection(cfg.DBString)
+	dbWriteConnection, err := postgres.NewWriteConnection(cfg.WriteDBString)
 	if err != nil {
 		panic(fmt.Errorf("failed to connect to the database: %w", err))
 	}
 
-	defer func(dbConn *sql.DB) {
-		if err = postgres.CloseConnection(dbConn); err != nil {
+	defer func(dbWriteConnection *sql.DB) {
+		if err = postgres.CloseConnection(dbWriteConnection); err != nil {
 			logger.Error("failed to close the database connection", slogger.Err(err))
 			return
 		}
-	}(dbConnection)
+	}(dbWriteConnection)
 
 	users := make([]model.User, userCount)
 	for i := 0; i < userCount; i++ {
@@ -62,7 +62,7 @@ func main() {
 		}
 	}
 
-	err = insertUsers(dbConnection, users)
+	err = insertUsers(dbWriteConnection, users)
 	if err != nil {
 		panic(fmt.Errorf("failed to insert users: %w", err))
 	}

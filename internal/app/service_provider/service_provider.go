@@ -6,13 +6,15 @@ import (
 )
 
 type ServiceProvider struct {
-	Logger       *slog.Logger
-	DBConnection *sql.DB
+	Logger            *slog.Logger
+	DBReadConnection  *sql.DB
+	DBWriteConnection *sql.DB
 }
 
-func NewServiceProvider(logger *slog.Logger, DBConnection *sql.DB) *ServiceProvider {
+func NewServiceProvider(logger *slog.Logger, DBReadConnection *sql.DB, DBWriteConnection *sql.DB) *ServiceProvider {
 	return &ServiceProvider{
-		Logger:       logger,
-		DBConnection: DBConnection,
+		Logger:            logger,
+		DBReadConnection:  DBReadConnection,
+		DBWriteConnection: DBWriteConnection,
 	}
 }

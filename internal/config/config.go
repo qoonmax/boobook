@@ -8,7 +8,8 @@ import (
 
 type Config struct {
 	Env              string `env:"ENV" env-default:"dev"`
-	DBString         string `env:"DATABASE_DBSTRING" env-required:"true"`
+	ReadDBString     string `env:"READ_DATABASE_DBSTRING" env-required:"true"`
+	WriteDBString    string `env:"WRITE_DATABASE_DBSTRING" env-required:"true"`
 	HTTPServerConfig HTTPServerConfig
 }
 

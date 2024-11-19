@@ -12,11 +12,15 @@ import (
 )
 
 type userRepository struct {
-	db *sql.DB
+	DBReadConnection  *sql.DB
+	DBWriteConnection *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) repository.UserRepository {
-	return &userRepository{db: db}
+func NewUserRepository(DBReadConnection *sql.DB, DBWriteConnection *sql.DB) repository.UserRepository {
+	return &userRepository{
+		DBReadConnection:  DBReadConnection,
+		DBWriteConnection: DBWriteConnection,
+	}
 }
 
 // TODO: Создать нормальные ошибки
@@ -24,7 +28,7 @@ func (r *userRepository) Create(user *model.User) error {
 	const fnErr = "repository.postgres.userRepository.Create"
 
 	var exists bool
-	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE email=$1)", user.Email).Scan(&exists)
+	err := r.DBReadConnection.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE email=$1)", user.Email).Scan(&exists)
 	if err != nil {
 		return fmt.Errorf("(%s) error executing user existence check query: %w", fnErr, err)
 	}
@@ -33,7 +37,7 @@ func (r *userRepository) Create(user *model.User) error {
 		return repository.ErrUserAlreadyExists
 	}
 
-	stmt, err := r.db.Prepare("INSERT INTO users (email, password, first_name, last_name, date_of_birth, gender, interests, city) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")
+	stmt, err := r.DBWriteConnection.Prepare("INSERT INTO users (email, password, first_name, last_name, date_of_birth, gender, interests, city) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")
 	if err != nil {
 		return fmt.Errorf("(%s) error preparing insert statement: %w", fnErr, err)
 	}
@@ -62,7 +66,7 @@ func (r *userRepository) GetByEmail(email string) (*model.User, error) {
 		FROM users 
 		WHERE email=$1
 	`
-	err := r.db.QueryRow(query, email).Scan(
+	err := r.DBReadConnection.QueryRow(query, email).Scan(
 		&user.ID,
 		&user.Email,
 		&user.Password,
@@ -95,7 +99,7 @@ func (r *userRepository) Get(id uint) (*model.User, error) {
 		FROM users 
 		WHERE id=$1
 	`
-	err := r.db.QueryRow(query, id).Scan(
+	err := r.DBReadConnection.QueryRow(query, id).Scan(
 		&user.ID,
 		&user.Email,
 		&user.Password,
@@ -151,7 +155,7 @@ func (r *userRepository) Search(firstName, lastName string) ([]*model.User, erro
 	}
 
 	fmt.Println(query, args)
-	rows, err = r.db.Query(query, args...)
+	rows, err = r.DBReadConnection.Query(query, args...)
 
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", fnErr, err)

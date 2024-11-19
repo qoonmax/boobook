@@ -1,15 +1,79 @@
+version: '3.8'
+
+networks:
+  pgnet:
+    internal: false
+
 services:
-  postgres:
+  postgres_master:
     image: postgres:latest
-    mem_limit: 1g
-    shm_size: 512m
-    command: -c 'max_connections=100'
+    ports:
+      - "6000:5432"
+    environment:
+      POSTGRES_USER: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      REPLICATION_USER: ${REPLICATION_USER}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD}
+    volumes:
+      - ./docker/database/master/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./docker/database/master/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./database/data/master:/var/lib/postgresql/data
+      - ./database/data/master-dump:/var/lib/postgresql/master-dump
+      - ./docker/database/master/create-replicator-user.sh:/docker-entrypoint-initdb.d/create-replicator-user.sh
+    networks:
+      - pgnet
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf",
+              "-c", "hba_file=/etc/postgresql/pg_hba.conf"]
+    container_name: postgres_master
+
+  postgres_replica_1:
+    image: postgres:latest
+    ports:
+      - "6001:5432"
+    environment:
+      POSTGRES_USER: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      REPLICATION_USER: ${REPLICATION_USER}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD}
+    volumes:
+      - ./database/data/replica_1:/var/lib/postgresql/data
+    depends_on:
+      - postgres_master
+    networks:
+      - pgnet
+    container_name: postgres_replica_1
+
+  postgres_replica_2:
+    image: postgres:latest
+    ports:
+      - "6002:5432"
+    environment:
+      POSTGRES_USER: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      REPLICATION_USER: ${REPLICATION_USER}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD}
+    volumes:
+      - ./database/data/replica_2:/var/lib/postgresql/data
+    depends_on:
+      - postgres_master
+    networks:
+      - pgnet
+    container_name: postgres_replica_2
+
+  haproxy:
+    image: haproxy:latest
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      - "5433:5433"
     volumes:
-      - ./database/data:/var/lib/postgresql/data
-    container_name: boobook-postgres
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - postgres_master
+      - postgres_replica_1
+      - postgres_replica_2
+    networks:
+      - pgnet
+    container_name: haproxy

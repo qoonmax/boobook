@@ -29,7 +29,7 @@ func (sp *ServiceProvider) GetUserService() service.UserService {
 
 func (sp *ServiceProvider) GetUserRepository() repository.UserRepository {
 	if userRepositoryContainer == nil {
-		userRepositoryContainer = postgres.NewUserRepository(sp.DBConnection)
+		userRepositoryContainer = postgres.NewUserRepository(sp.DBReadConnection, sp.DBWriteConnection)
 	}
 	return userRepositoryContainer
 }
