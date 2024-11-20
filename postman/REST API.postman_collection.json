@@ -175,6 +175,44 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "Post feed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjU0NzEyNzEsInVzZXJfZW1haWwiOiJxb29ubWF4QHlhbmRleC5ydSJ9.xlp_ixZ8qibRa9CnF74DIVPl4jUf44AWJCCcvVEc1IM",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/users/search?first_name=al",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"search"
+							],
+							"query": [
+								{
+									"key": "first_name",
+									"value": "al"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
