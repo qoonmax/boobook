@@ -13,3 +13,7 @@ type UserHandler interface {
 	Get(ctx *gin.Context)
 	Search(ctx *gin.Context)
 }
+
+type PostHandler interface {
+	GetList(ctx *gin.Context)
+}

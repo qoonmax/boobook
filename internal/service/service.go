@@ -19,3 +19,7 @@ type UserService interface {
 	Get(id uint) (*model.User, error)
 	Search(firstName string, lastName string) ([]*model.User, error)
 }
+
+type PostService interface {
+	GetList() ([]*model.Post, error)
+}

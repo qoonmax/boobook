@@ -77,3 +77,13 @@ services:
     networks:
       - pgnet
     container_name: haproxy
+
+  redis:
+    image: redis:6.2-alpine
+    volumes:
+      - ./redis_data:/data
+    command: redis-server --save 5 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    container_name: redis

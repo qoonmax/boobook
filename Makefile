@@ -24,8 +24,8 @@ migrate_down:
 	GOOSE_DRIVER=$(DATABASE_DRIVER) GOOSE_DBSTRING=$(WRITE_DATABASE_DBSTRING) GOOSE_MIGRATION_DIR=$(DATABASE_MIGRATION_DIR) goose down
 
 migrate_fresh:
-	docker compose exec -T postgres psql -U $(DATABASE_USER) -d $(DATABASE_NAME) -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
+	docker compose exec -T postgres_master psql -U $(DATABASE_USER) -d $(DATABASE_NAME) -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
 	$(MAKE) migrate_up
 
-run_user_seeder:
-	go run cmd/seed/user.go
+run_seeder:
+	go run cmd/seed/seeder.go
