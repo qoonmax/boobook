@@ -30,7 +30,9 @@ func Auth() gin.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			userId := claims["user_id"].(string)
 			userEmail := claims["user_email"].(string)
+			ctx.Set("user_id", userId)
 			ctx.Set("user_email", userEmail)
 		} else {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
