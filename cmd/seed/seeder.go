@@ -8,13 +8,14 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-faker/faker/v4"
+	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"strings"
 	"time"
 )
 
 const (
-	userCount = 1000000
+	userCount = 1000
 	batchSize = 5000
 )
 
@@ -67,6 +68,18 @@ func generateAndInsertUsers(db *sql.DB) error {
 		var valueStrings []string
 
 		for j := 0; j < batchSize && i+j < userCount; j++ {
+			// Создание пользователя для тестирования
+			if j == 0 {
+				valueStrings = append(valueStrings, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+					len(values)+1, len(values)+2, len(values)+3, len(values)+4, len(values)+5, len(values)+6, len(values)+7, len(values)+8))
+				hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+				if err != nil {
+					return err
+				}
+				values = append(values, "admin@admin.com", hashedPassword, "John", "Doe", time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC), genders[1], "programming", cities[0])
+				continue
+			}
+
 			dateOfBirth, err := time.Parse(time.DateOnly, faker.Date())
 			if err != nil {
 				return fmt.Errorf("failed to parse date of birth: %w", err)
