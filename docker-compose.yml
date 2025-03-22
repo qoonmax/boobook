@@ -1,5 +1,5 @@
 services:
-  postgres:
+  postgres-master:
     image: postgres:latest
     mem_limit: 1g
     shm_size: 512m
@@ -11,5 +11,31 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     volumes:
-      - ./database/data:/var/lib/postgresql/data
-    container_name: boobook-postgres
+      - ./database/data_master:/var/lib/postgresql/data
+    container_name: boobook-postgres-master
+
+  postgres-slave:
+    image: postgres:latest
+    mem_limit: 1g
+    shm_size: 512m
+    command: -c 'max_connections=100'
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./database/data_slave:/var/lib/postgresql/data
+    container_name: boobook-postgres-slave
+
+  haproxy:
+    image: haproxy:latest
+    container_name: boobook-haproxy
+    ports:
+      - "5434:5432"  # Порт для подключения к HAProxy
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - postgres-master
+      - postgres-slave
