@@ -2,3 +2,5 @@
 tmp
 /database/data_master
 /database/data_slave
+.env
+/redis_data

@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "f6b5b771-7e67-4510-9f76-4cb230841a2d",
-		"name": "REST API",
+		"name": "Main service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "32608587"
 	},
@@ -46,7 +46,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"qoonmax@yandex.ru\",\n    \"password\": \"password\"\n}",
+							"raw": "{\n    \"email\": \"admin@admin.com\",\n    \"password\": \"password\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -121,7 +121,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjQ0NTEzMjIsInVzZXJfZW1haWwiOiJxb29ubWF4QHlhbmRleC5ydSJ9.K6ehNA8iwQTMDSseft01EM2BIcD6iLOhu8bsEypoCKI",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzQ2MTYxMTgsInVzZXJfZW1haWwiOiJhZG1pbkBhZG1pbi5jb20iLCJ1c2VyX2lkIjoxfQ.VmP9aFw8Nm0IpCshWdoGtId4EB2HADt0I9U_xy5-4lM",
 								"type": "text"
 							}
 						],
@@ -143,6 +143,44 @@
 				},
 				{
 					"name": "Search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjU0NzEyNzEsInVzZXJfZW1haWwiOiJxb29ubWF4QHlhbmRleC5ydSJ9.xlp_ixZ8qibRa9CnF74DIVPl4jUf44AWJCCcvVEc1IM",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/api/users/search?first_name=al",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"search"
+							],
+							"query": [
+								{
+									"key": "first_name",
+									"value": "al"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "Post feed",
 					"request": {
 						"method": "GET",
 						"header": [

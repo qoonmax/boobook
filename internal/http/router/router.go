@@ -22,6 +22,10 @@ func SetupRouter(serviceProvider *service_provider.ServiceProvider) *gin.Engine 
 			users.Use(middleware.Auth()).GET("/:id", serviceProvider.GetUserHandler().Get)
 			users.Use(middleware.Auth()).GET("/search", serviceProvider.GetUserHandler().Search)
 		}
+		posts := api.Group("/posts")
+		{
+			posts.Use(middleware.Auth()).GET("/feed", serviceProvider.GetPostHandler().GetList)
+		}
 	}
 
 	return router

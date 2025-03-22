@@ -2,11 +2,16 @@
 
 ![Image alt](https://github.com/qoonmax/boobook/blob/main/cover.jpg)
 
-### Локальная установка
+### Локальная установка:
 1. Склонировать репозиторий;
 2. Выполнить ``cp .env.example .env``;
 3. Запустить ``make to-dev``;
-4. Запустить ``make run``.
+4. Запустить ``./docker/database/replica/sync-data.sh`` 
+чтобы синхронизировать данные между мастером и репликой;
+
+### Отчеты по выполненным заданиям:
+1. [Влияние индексов на производительность PostgreSQL;](/reports/index_impact/report.md)
+2. [Репликации: домашнее задание.](/reports/replication/report.md)
 
 ### TODO список доработок:
 1. [x] Инжектить логгер в контроллеры, убрать глобальный;

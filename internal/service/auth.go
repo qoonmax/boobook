@@ -55,6 +55,7 @@ func (s *authService) Login(loginRequest *request.LoginRequest) (string, error) 
 	}
 
 	payload := jwt.MapClaims{
+		"user_id":    user.ID,
 		"user_email": user.Email,
 		"exp":        time.Now().Add(time.Hour * 72).Unix(),
 	}

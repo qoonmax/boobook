@@ -16,3 +16,7 @@ type UserRepository interface {
 	Create(user *model.User) error
 	Search(firstName, lastName string) ([]*model.User, error)
 }
+
+type PostRepository interface {
+	GetList() ([]*model.Post, error)
+}
